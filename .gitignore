@@ -1,0 +1,7 @@
+.idea/
+*.iml
+**/target/
+**/logs/
+/web
+/mq-kafka
+/kafka-spring-test
