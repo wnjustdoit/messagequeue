@@ -10,11 +10,11 @@
     <modules>
         <module>kafka</module>
         <module>kafka-integration-spring</module>
-        <module>kafka-integration-spring-test</module>
+        <module>kafka-integration-spring-new</module>
     </modules>
     <packaging>pom</packaging>
 
-    <name>messagequeue parent</name>
-    <description>消息队列客户端的封装</description>
+    <name>messagequeue-parent</name>
+    <description>消息队列客户端</description>
 
 </project>

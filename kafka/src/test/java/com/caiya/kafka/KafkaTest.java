@@ -49,7 +49,7 @@ public class KafkaTest {
         template.sendDefault(2, "bar").get();
         template.sendDefault(0, "baz").get();
         template.sendDefault(2, "qux").get();
-        template.flush();
+//        template.flush();
         latch.await(5, TimeUnit.SECONDS);
         container.stop();
         logger.info("Stop auto");
