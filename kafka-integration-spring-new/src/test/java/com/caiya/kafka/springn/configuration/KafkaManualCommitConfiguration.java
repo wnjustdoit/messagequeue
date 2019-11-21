@@ -12,44 +12,44 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 
 /**
- * Kafka相关配置（自动提交）.
+ * Kafka相关配置（手动提交）.
  *
  * @author wangnan
  * @since 1.0
  */
 @Configuration
-public class KafkaAutoCommitConfiguration {
+public class KafkaManualCommitConfiguration {
 
     @Resource
-    private KafkaProperties autoCommitKafkaProperties;
+    private KafkaProperties manualCommitKafkaProperties;
 
     @Bean
-    @ConfigurationProperties(prefix = "kafka.test-auto")
-    public KafkaProperties autoCommitKafkaProperties() {
+    @ConfigurationProperties(prefix = "kafka.test-manual")
+    public KafkaProperties manualCommitKafkaProperties() {
         return new KafkaProperties();
     }
 
     @Bean
-    public ProducerFactory<String, String> autoCommitProducerFactory() {
+    public ProducerFactory<String, String> manualCommitProducerFactory() {
         StringSerializer stringSerializer = new StringSerializer();
-        return new DefaultKafkaProducerFactory<>(autoCommitKafkaProperties.getProducerConfig(),
+        return new DefaultKafkaProducerFactory<>(manualCommitKafkaProperties.getProducerConfig(),
                 stringSerializer, stringSerializer);
     }
 
     @Bean
-    public KafkaTemplate<String, String> autoCommitKafkaTemplate(ProducerFactory<String, String> autoCommitProducerFactory) {
-        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>(autoCommitProducerFactory);
-        if (!CollectionUtils.isEmpty(autoCommitKafkaProperties.getTopics())) {
+    public KafkaTemplate<String, String> manualCommitKafkaTemplate(ProducerFactory<String, String> manualCommitProducerFactory) {
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>(manualCommitProducerFactory);
+        if (!CollectionUtils.isEmpty(manualCommitKafkaProperties.getTopics())) {
             // use the first one as the default topic
-            kafkaTemplate.setDefaultTopic(autoCommitKafkaProperties.getTopics().iterator().next());
+            kafkaTemplate.setDefaultTopic(manualCommitKafkaProperties.getTopics().iterator().next());
         }
         return kafkaTemplate;
     }
 
     @Bean
-    public ConsumerFactory<String, String> autoCommitConsumerFactory() {
+    public ConsumerFactory<String, String> manualCommitConsumerFactory() {
         StringDeserializer stringDeserializer = new StringDeserializer();
-        return new DefaultKafkaConsumerFactory<>(autoCommitKafkaProperties.getConsumerConfig(),
+        return new DefaultKafkaConsumerFactory<>(manualCommitKafkaProperties.getConsumerConfig(),
                 stringDeserializer, stringDeserializer);
     }
 

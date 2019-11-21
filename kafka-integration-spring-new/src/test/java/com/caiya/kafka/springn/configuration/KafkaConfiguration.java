@@ -12,7 +12,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 
 /**
- * Kafka相关配置.
+ * Kafka相关配置（自动提交）.
  *
  * @author wangnan
  * @since 1.0

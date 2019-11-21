@@ -28,7 +28,7 @@ public class KafkaTemplateTests {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     @Resource
-    private KafkaTemplate<String, String> autoCommitKafkaTemplate;
+    private KafkaTemplate<String, String> manualCommitKafkaTemplate;
 
     @Test
     public void sendDefaultTest() throws ExecutionException, InterruptedException {
@@ -44,7 +44,7 @@ public class KafkaTemplateTests {
             int finalI = i;
             executor.execute(() -> {
                 kafkaTemplate.sendDefault("Hello, world. " + finalI);
-                autoCommitKafkaTemplate.sendDefault("Hello, world. " + finalI);
+                manualCommitKafkaTemplate.sendDefault("Hello, world. " + finalI);
             });
         }
 

@@ -42,6 +42,15 @@ public interface GenericMessageListener<T> {
     }
 
     /**
+     * If null, subscribe all partitions.
+     *
+     * @return partitions to subscribe.
+     */
+    default Collection<Integer> partitions() {
+        return null;
+    }
+
+    /**
      * @return polling timeout in millis.
      */
     default long pollTimeoutInMillis() {

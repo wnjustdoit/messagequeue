@@ -1,6 +1,5 @@
 package com.caiya.kafka.springn.listener;
 
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 /**

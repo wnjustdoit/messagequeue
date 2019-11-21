@@ -9,6 +9,8 @@ import java.util.Collections;
 
 /**
  * TestMessageListener.
+ * </p>
+ * 自动提交测试
  *
  * @author wangnan
  * @since 1.0.0, 2019/11/19
