@@ -6,11 +6,11 @@
 
     <groupId>com.caiya</groupId>
     <artifactId>messagequeue-parent</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
     <modules>
-        <module>kafka</module>
-        <module>kafka-integration-spring</module>
         <module>kafka-integration-spring-new</module>
+        <module>kafka-spring-boot-starter</module>
+        <module>kafka-tools</module>
     </modules>
     <packaging>pom</packaging>
 

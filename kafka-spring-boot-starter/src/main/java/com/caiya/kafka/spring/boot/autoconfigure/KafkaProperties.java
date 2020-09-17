@@ -1,6 +1,7 @@
-package com.caiya.kafka.springn.component;
+package com.caiya.kafka.spring.boot.autoconfigure;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,11 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Kafka的属性配置类.
+ * KafkaProperties.
  *
  * @author wangnan
- * @since 1.0
- */
+ * @since 1.2.0, 2019/12/4
+ **/
+@ConfigurationProperties(prefix = "kafka")
 public class KafkaProperties implements InitializingBean {
 
     private Map<String, Object> producerConfig;
@@ -54,7 +56,7 @@ public class KafkaProperties implements InitializingBean {
     /**
      * 配置转换，将"-"替换为"."（yml文件不允许下划线_和.等符号）
      */
-    public static void filterKafkaProperties(com.caiya.kafka.springn.component.KafkaProperties kafkaProperties) {
+    public static void filterKafkaProperties(KafkaProperties kafkaProperties) {
         if (kafkaProperties.getProducerConfig() != null) {
             Map<String, Object> configMap = new HashMap<>();
             for (Map.Entry<String, Object> configEntry : kafkaProperties.getProducerConfig().entrySet()) {

@@ -197,7 +197,7 @@ public interface KafkaOperations<K, V> {
     }
 
     /**
-     * A callback for executing arbitrary operations on the {@link KafkaOperations}.
+     * A callback for executing arbitrary operations on the {@link com.caiya.kafka.springn.core.KafkaOperations}.
      *
      * @param <K> the key type.
      * @param <V> the value type.
@@ -206,7 +206,7 @@ public interface KafkaOperations<K, V> {
      */
     interface OperationsCallback<K, V, T> {
 
-        T doInOperations(KafkaOperations<K, V> operations);
+        T doInOperations(com.caiya.kafka.springn.core.KafkaOperations<K, V> operations);
 
     }
 

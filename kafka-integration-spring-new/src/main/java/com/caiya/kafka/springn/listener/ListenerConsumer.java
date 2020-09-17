@@ -8,19 +8,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The entrance of Consumers' messaging.
@@ -28,37 +25,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author wangnan
  * @since 1.0.0, 2019/11/19
  **/
-@Component
-@ConditionalOnBean(ConsumerFactory.class)
-public class ListenerConsumer<K, V> implements ApplicationContextAware, InitializingBean, DisposableBean {
+public class ListenerConsumer<K, V> implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent>, DisposableBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(ListenerConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(com.caiya.kafka.springn.listener.ListenerConsumer.class);
 
-    private static final int MAX_MESSAGING_THREAD_COUNT = 20;
+    private static final int MAX_MESSAGING_THREAD_COUNT = 50;
 
-    private static final AtomicBoolean RUNNABLE = new AtomicBoolean(true);
+    private volatile boolean runnable;
 
     private ApplicationContext applicationContext;
 
     private final ConsumerFactory<K, V> defaultConsumerFactory;
 
-    @Autowired
+
     public ListenerConsumer(ConsumerFactory<K, V> consumerFactory) {
         this.defaultConsumerFactory = consumerFactory;
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        this.boot();
-    }
-
-
-    private void boot() {
+    @SuppressWarnings("rawtypes")
+    private void boot() throws IllegalAccessException {
         Map<String, GenericMessageListener> messageListenerMap = applicationContext.getBeansOfType(GenericMessageListener.class);
         if (messageListenerMap != null) {
             if (messageListenerMap.values().size() > MAX_MESSAGING_THREAD_COUNT) {
                 logger.warn("message listener number exceed MAX_MESSAGING_THREAD_COUNT[" + MAX_MESSAGING_THREAD_COUNT + "]");
-                return;
+                throw new IllegalAccessException("too many listeners with a number of " + messageListenerMap.values().size());
             }
             messageListenerMap.values().forEach(messageListener -> {
                 if (!CollectionUtils.isEmpty(messageListener.topics())) {
@@ -68,9 +58,12 @@ public class ListenerConsumer<K, V> implements ApplicationContextAware, Initiali
                     logger.warn("kafka topics cannot be empty, message listener:" + messageListener);
                 }
             });
+        } else {
+            logger.warn("no listener consumers found");
         }
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     class KafkaConsumerRunner implements Runnable {
 
         private final GenericMessageListener messageListener;
@@ -80,7 +73,6 @@ public class ListenerConsumer<K, V> implements ApplicationContextAware, Initiali
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public void run() {
             Consumer<K, V> consumer;
             if (StringUtils.hasText(messageListener.consumerFactoryName())) {
@@ -102,8 +94,14 @@ public class ListenerConsumer<K, V> implements ApplicationContextAware, Initiali
                 });
                 consumer.assign(topicPartitions);
             }
-            while (RUNNABLE.get()) {
+
+            while (runnable) {
                 ConsumerRecords<K, V> consumerRecords = consumer.poll(messageListener.pollTimeoutInMillis());
+                if (consumerRecords.isEmpty()) {
+                    continue;
+                }
+
+                // when exception happens, the consumer thread will be destroyed
                 if (messageListener instanceof MessageListener) {
                     messageListener.onMessage(consumerRecords);
                 } else if (messageListener instanceof AcknowledgingMessageListener) {
@@ -111,7 +109,19 @@ public class ListenerConsumer<K, V> implements ApplicationContextAware, Initiali
                 } else {
                     throw new UnsupportedOperationException("Unsupported message listener type:" + messageListener);
                 }
+
             }
+
+        }
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        this.runnable = true;
+        try {
+            this.boot();
+        } catch (IllegalAccessException e) {
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -122,7 +132,7 @@ public class ListenerConsumer<K, V> implements ApplicationContextAware, Initiali
 
     @Override
     public void destroy() throws Exception {
-        RUNNABLE.compareAndSet(true, false);
+        this.runnable = false;
     }
 
 

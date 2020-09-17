@@ -235,7 +235,7 @@ public class KafkaTemplate<K, V> implements KafkaOperations<K, V> {
      * {@inheritDoc}
      * <p><b>Note</b> It only makes sense to invoke this method if the
      * {@link ProducerFactory} serves up a singleton producer (such as the
-     * {@link DefaultKafkaProducerFactory}).
+     * {@link com.caiya.kafka.springn.core.DefaultKafkaProducerFactory}).
      */
     @Override
     public void flush() {
@@ -292,23 +292,23 @@ public class KafkaTemplate<K, V> implements KafkaOperations<K, V> {
                 try {
                     if (exception == null) {
                         future.set(new SendResult<>(producerRecord, metadata));
-                        if (KafkaTemplate.this.producerListener != null) {
-                            KafkaTemplate.this.producerListener.onSuccess(producerRecord, metadata);
+                        if (com.caiya.kafka.springn.core.KafkaTemplate.this.producerListener != null) {
+                            com.caiya.kafka.springn.core.KafkaTemplate.this.producerListener.onSuccess(producerRecord, metadata);
                         }
-                        if (KafkaTemplate.this.logger.isTraceEnabled()) {
-                            KafkaTemplate.this.logger.trace("Sent ok: " + producerRecord + ", metadata: " + metadata);
+                        if (com.caiya.kafka.springn.core.KafkaTemplate.this.logger.isTraceEnabled()) {
+                            com.caiya.kafka.springn.core.KafkaTemplate.this.logger.trace("Sent ok: " + producerRecord + ", metadata: " + metadata);
                         }
                     } else {
                         future.setException(new KafkaProducerException(producerRecord, "Failed to send", exception));
-                        if (KafkaTemplate.this.producerListener != null) {
-                            KafkaTemplate.this.producerListener.onError(producerRecord, exception);
+                        if (com.caiya.kafka.springn.core.KafkaTemplate.this.producerListener != null) {
+                            com.caiya.kafka.springn.core.KafkaTemplate.this.producerListener.onError(producerRecord, exception);
                         }
-                        if (KafkaTemplate.this.logger.isDebugEnabled()) {
-                            KafkaTemplate.this.logger.debug("Failed to send: " + producerRecord, exception);
+                        if (com.caiya.kafka.springn.core.KafkaTemplate.this.logger.isDebugEnabled()) {
+                            com.caiya.kafka.springn.core.KafkaTemplate.this.logger.debug("Failed to send: " + producerRecord, exception);
                         }
                     }
                 } finally {
-                    if (!KafkaTemplate.this.transactional) {
+                    if (!com.caiya.kafka.springn.core.KafkaTemplate.this.transactional) {
                         closeProducer(producer, false);
                     }
                 }

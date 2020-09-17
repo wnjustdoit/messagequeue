@@ -11,7 +11,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
  * @author wangnan
  * @since 1.0.0, 2019/11/19
  */
-public interface AcknowledgingMessageListener<K, V> extends GenericMessageListener<ConsumerRecords<K, V>> {
+public interface AcknowledgingMessageListener<K, V> extends com.caiya.kafka.springn.listener.GenericMessageListener<ConsumerRecords<K, V>> {
 
     @Override
     default void onMessage(ConsumerRecords<K, V> data) {

@@ -1,11 +1,12 @@
 package com.caiya.kafka.springn.listener;
 
+import com.caiya.kafka.springn.component.KafkaProperties;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * TestMessageListener.
@@ -18,16 +19,19 @@ import java.util.Collections;
 @Component
 public class TestMessageListener implements MessageListener<String, String> {
 
+    @Resource
+    private KafkaProperties kafkaProperties;
+
     @Override
     public void onMessage(ConsumerRecords<String, String> data) {
-        for (ConsumerRecord record : data) {
+        for (ConsumerRecord<String, String> record : data) {
             logger().info("======record=====:" + record);
         }
     }
 
     @Override
     public Collection<String> topics() {
-        return Collections.singleton("test");
+        return kafkaProperties.getTopics();
     }
 
 }

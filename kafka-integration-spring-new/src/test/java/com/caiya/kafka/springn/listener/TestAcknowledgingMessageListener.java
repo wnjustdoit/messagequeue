@@ -1,16 +1,13 @@
 package com.caiya.kafka.springn.listener;
 
+import com.caiya.kafka.springn.component.KafkaProperties;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
-import org.apache.kafka.common.TopicPartition;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import javax.annotation.Resource;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * TestAcknowledgingMessageListener.
@@ -27,11 +24,33 @@ import java.util.List;
 @Component
 public class TestAcknowledgingMessageListener implements AcknowledgingMessageListener<String, String> {
 
+    @Resource
+    private KafkaProperties manualCommitKafkaProperties;
+
+    /**
+     * 当业务需要严格的消费顺序，且当前消息必须消费成功时，才能消费接下来的消息。
+     * 可以做个标记是否需要下一次的消费，或者直接抛出异常，那么消费线程将终结
+     */
+    private volatile boolean flag = true;
+
     @Override
     public void onMessage(ConsumerRecords<String, String> data, Consumer<?, ?> consumer) {
+
+        if (!flag)
+            return;
         // 消费方式一：
-        for (ConsumerRecord record : data) {
-            logger().info("======record=====:" + record);
+//        logger().info("======records=====:" + JSON.toJSONString(data));
+        for (ConsumerRecord<String, String> record : data) {
+            try {
+                logger().info("======record=====:" + record);
+                if (record.value().contains("aaa")) {
+                    continue;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+//                send msg 告警通知
+                flag = false;// 或者直接抛出异常，中断消费线程（下次重启触发新的消费时，直接从已提交的offset+1继续消费）
+            }
             consumer.commitSync();
         }
 
@@ -47,8 +66,13 @@ public class TestAcknowledgingMessageListener implements AcknowledgingMessageLis
     }
 
     @Override
+    public long pollTimeoutInMillis() {
+        return 2000;
+    }
+
+    @Override
     public Collection<String> topics() {
-        return Collections.singleton("test.manual");
+        return manualCommitKafkaProperties.getTopics();
     }
 
     @Override
@@ -58,7 +82,7 @@ public class TestAcknowledgingMessageListener implements AcknowledgingMessageLis
 
     @Override
     public Collection<Integer> partitions() {
-        return Arrays.asList(0);
+        return null;
     }
 
 }

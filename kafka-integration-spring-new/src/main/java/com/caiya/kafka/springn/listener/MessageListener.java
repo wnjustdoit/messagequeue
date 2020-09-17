@@ -10,6 +10,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
  * @author wangnan
  * @since 1.0.0, 2019/11/19
  */
-public interface MessageListener<K, V> extends GenericMessageListener<ConsumerRecords<K, V>> {
+public interface MessageListener<K, V> extends com.caiya.kafka.springn.listener.GenericMessageListener<ConsumerRecords<K, V>> {
 
 }

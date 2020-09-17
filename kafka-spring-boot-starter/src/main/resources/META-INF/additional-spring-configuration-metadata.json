@@ -1,0 +1,55 @@
+{
+  "groups": [
+    {
+      "name": "kafka",
+      "type": "com.caiya.kafka.spring.boot.autoconfigure.KafkaProperties",
+      "sourceType": "com.caiya.kafka.spring.boot.autoconfigure.KafkaProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "kafka.producer-config",
+      "type": "java.lang.String",
+      "sourceType": "com.caiya.kafka.spring.boot.autoconfigure.KafkaProperties"
+    },
+    {
+      "name": "kafka.consumer-config",
+      "type": "java.lang.String",
+      "sourceType": "com.caiya.kafka.spring.boot.autoconfigure.KafkaProperties"
+    },
+    {
+      "name": "kafka.topics",
+      "type": "java.lang.String",
+      "sourceType": "com.caiya.kafka.spring.boot.autoconfigure.KafkaProperties"
+    }
+  ],
+  "hints": [
+    {
+      "name": "kafka.producer-config",
+      "values": [
+        {
+          "value": "{bootstrap-servers: '127.0.0.1:9093,127.0.0.1:9094', acks: all, retries: 0, batch-size: 16384, linger-ms: 1, buffer-memory: 33554432}",
+          "description": "kafka producer configuration(Map)"
+        }
+      ]
+    },
+    {
+      "name": "kafka.consumer-config",
+      "values": [
+        {
+          "value": "{bootstrap-servers: '127.0.0.1:9093,127.0.0.1:9094', group-id: test, enable-auto-commit: true, auto-commit-interval-ms: 1000, session-timeout-ms: 15000}",
+          "description": "kafka consumer configuration(Map)"
+        }
+      ]
+    },
+    {
+      "name": "kafka.topics",
+      "values": [
+        {
+          "value": "test",
+          "description": "kafka default topics(String, spilt by ,)"
+        }
+      ]
+    }
+  ]
+}

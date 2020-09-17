@@ -1,36 +1,41 @@
-package com.caiya.kafka.springn.configuration;
+package com.caiya.kafka.spring.boot.autoconfigure;
 
-import com.caiya.kafka.springn.component.KafkaProperties;
 import com.caiya.kafka.springn.core.*;
 import com.caiya.kafka.springn.listener.ListenerConsumer;
+import org.apache.kafka.clients.KafkaClient;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
-
 /**
- * Kafka相关配置（自动提交）.
+ * KafkaAutoConfiguration.
  *
  * @author wangnan
- * @since 1.0
- */
+ * @since 1.2.0, 2019/12/4
+ **/
 @Configuration
-public class KafkaConfiguration {
+@ConditionalOnClass({KafkaClient.class, KafkaTemplate.class})
+@ConditionalOnMissingBean({ProducerFactory.class, KafkaTemplate.class, ConsumerFactory.class})
+@EnableConfigurationProperties(KafkaProperties.class)
+public class KafkaAutoConfiguration {
 
-    @Resource
-    private KafkaProperties kafkaProperties;
+    private final KafkaProperties kafkaProperties;
 
-    @Bean
-    @ConfigurationProperties(prefix = "kafka.test")
-    public KafkaProperties kafkaProperties() {
-        return new KafkaProperties();
+    @Autowired
+    public KafkaAutoConfiguration(KafkaProperties kafkaProperties) {
+        this.kafkaProperties = kafkaProperties;
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "kafka.producer-config", name = "bootstrap-servers")
     public ProducerFactory<String, String> producerFactory() {
         StringSerializer stringSerializer = new StringSerializer();
         return new DefaultKafkaProducerFactory<>(kafkaProperties.getProducerConfig(),
@@ -38,8 +43,10 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(ProducerFactory.class)
     public KafkaTemplate<String, String> kafkaTemplate(ProducerFactory<String, String> producerFactory) {
         KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>(producerFactory);
+        // you'd better set a default topic, or else some methods of KafkaTemplate cannot be used, such as sendDefault..
         if (!CollectionUtils.isEmpty(kafkaProperties.getTopics())) {
             // use the first one as the default topic
             kafkaTemplate.setDefaultTopic(kafkaProperties.getTopics().iterator().next());
@@ -48,6 +55,7 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "kafka.consumer-config", name = "bootstrap-servers")
     public ConsumerFactory<String, String> consumerFactory() {
         StringDeserializer stringDeserializer = new StringDeserializer();
         return new DefaultKafkaConsumerFactory<>(kafkaProperties.getConsumerConfig(),
@@ -55,6 +63,7 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(ConsumerFactory.class)
     public ListenerConsumer<String, String> listenerConsumer() {
         return new ListenerConsumer<>(consumerFactory());
     }

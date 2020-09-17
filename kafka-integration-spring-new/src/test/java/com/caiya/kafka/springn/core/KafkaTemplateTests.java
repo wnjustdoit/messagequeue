@@ -15,7 +15,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * KafkaTemplateTests
+ * KafkaTemplateTests.
+ * </p>
+ * 单元测试入口。
  *
  * @author wangnan
  * @since 1.0.0, 2019/11/8
@@ -31,14 +33,21 @@ public class KafkaTemplateTests {
     private KafkaTemplate<String, String> manualCommitKafkaTemplate;
 
     @Test
-    public void sendDefaultTest() throws ExecutionException, InterruptedException {
+    public void testSendDefault() throws ExecutionException, InterruptedException {
         SendResult<String, String> result = kafkaTemplate.sendDefault("Hello, world.").get();
         Assert.assertNotNull(result);
         Assert.assertNotNull(result.getRecordMetadata());
     }
 
     @Test
-    public void test() throws InterruptedException {
+    public void testSendManual() throws ExecutionException, InterruptedException {
+        for (int i = 0; i < 100; i++) {
+            manualCommitKafkaTemplate.sendDefault("", "Hello, world. " + i).get();
+        }
+    }
+
+    @Test
+    public void testParallel() throws InterruptedException {
         ExecutorService executor = Executors.newFixedThreadPool(20);
         for (int i = 0; i < 100; i++) {
             int finalI = i;

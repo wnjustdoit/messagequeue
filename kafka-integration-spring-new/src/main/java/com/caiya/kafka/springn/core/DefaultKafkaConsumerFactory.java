@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The {@link ConsumerFactory} implementation to produce a new {@link Consumer} instance
+ * The {@link com.caiya.kafka.springn.core.ConsumerFactory} implementation to produce a new {@link Consumer} instance
  * for provided {@link Map} {@code configs} and optional {@link Deserializer} {@code keyDeserializer},
  * {@code valueDeserializer} implementations on each {@link #createConsumer()}
  * invocation.
@@ -19,7 +19,7 @@ import java.util.Map;
  * @param <K> the key type.
  * @param <V> the value type.
  */
-public class DefaultKafkaConsumerFactory<K, V> implements ConsumerFactory<K, V> {
+public class DefaultKafkaConsumerFactory<K, V> implements com.caiya.kafka.springn.core.ConsumerFactory<K, V> {
 
     private final Map<String, Object> configs;
 
@@ -122,7 +122,7 @@ public class DefaultKafkaConsumerFactory<K, V> implements ConsumerFactory<K, V> 
     public boolean isAutoCommit() {
         Object auto = this.configs.get(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG);
         return auto instanceof Boolean ? (Boolean) auto
-                : auto instanceof String ? Boolean.valueOf((String) auto) : true;
+                : auto instanceof String ? Boolean.parseBoolean((String) auto) : true;
     }
 
 }

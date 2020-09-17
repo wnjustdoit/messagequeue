@@ -5,14 +5,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.ObjectUtils;
 
 /**
- * The {@link ProducerListener} that logs exceptions thrown when sending messages.
+ * The {@link com.caiya.kafka.springn.support.ProducerListener} that logs exceptions thrown when sending messages.
  *
  * @param <K> the key type.
  * @param <V> the value type.
  */
-public class LoggingProducerListener<K, V> implements ProducerListener<K, V> {
+public class LoggingProducerListener<K, V> implements com.caiya.kafka.springn.support.ProducerListener<K, V> {
 
-    private static final Log log = LogFactory.getLog(LoggingProducerListener.class);
+    private static final Log log = LogFactory.getLog(com.caiya.kafka.springn.support.LoggingProducerListener.class);
 
     private boolean includeContents = true;
 
@@ -40,17 +40,15 @@ public class LoggingProducerListener<K, V> implements ProducerListener<K, V> {
     @Override
     public void onError(String topic, Integer partition, K key, V value, Exception exception) {
         if (log.isErrorEnabled()) {
-            StringBuffer logOutput = new StringBuffer();
+            StringBuilder logOutput = new StringBuilder();
             logOutput.append("Exception thrown when sending a message");
             if (this.includeContents) {
-                logOutput.append(" with key='"
-                        + toDisplayString(ObjectUtils.nullSafeToString(key), this.maxContentLogged) + "'");
-                logOutput.append(" and payload='"
-                        + toDisplayString(ObjectUtils.nullSafeToString(value), this.maxContentLogged) + "'");
+                logOutput.append(" with key='").append(toDisplayString(ObjectUtils.nullSafeToString(key), this.maxContentLogged)).append("'");
+                logOutput.append(" and payload='").append(toDisplayString(ObjectUtils.nullSafeToString(value), this.maxContentLogged)).append("'");
             }
-            logOutput.append(" to topic " + topic);
+            logOutput.append(" to topic ").append(topic);
             if (partition != null) {
-                logOutput.append(" and partition " + partition);
+                logOutput.append(" and partition ").append(partition);
             }
             logOutput.append(":");
             log.error(logOutput, exception);
