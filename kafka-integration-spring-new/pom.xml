@@ -19,7 +19,7 @@
         <junit.version>4.12</junit.version>
         <lombok.version>1.16.18</lombok.version>
         <fastjson.version>1.2.56.sec06</fastjson.version>
-        <logback.version>1.1.11</logback.version>
+        <logback.version>1.2.0</logback.version>
         <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
         <spring.version>5.0.8.RELEASE</spring.version>
     </properties>
